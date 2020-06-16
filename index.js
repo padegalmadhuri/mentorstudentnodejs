@@ -6,7 +6,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const mongodb = require('mongodb');
 const mongoClient = mongodb.MongoClient;
-const dbURL = `mongodb+srv://Madhuri:sreedhar@123@mentortstudent.zhhty.mongodb.net/studentmentor?retryWrites=true&w=majority`;
+const dbURL = `mongodb+srv://Madhuri:sreedhar123@cluster0-uzatp.mongodb.net/studentmentor1?retryWrites=true&w=majority`;
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "*");
@@ -40,7 +40,7 @@ app.post('/mentor', (req, res) => {
         obj["students"] = [];
         mongoClient.connect(dbURL, (err, client) => {
                 if (err) throw err;
-                let db = client.db('studentmentor');
+                let db = client.db('studentmentor1');
                 db.collection("mentor").insertOne(obj, (err, data) => {
                     if (err) throw err;
                     client.close();
@@ -73,7 +73,7 @@ app.post('/students', (req, res) => {
         obj["mentor"] = "";
         mongoClient.connect(dbURL, (err, client) => {
                 if (err) throw err;
-                let db = client.db('studentmentor');
+                let db = client.db('studentmentor11');
                 db.collection("student").insertOne(req.body, (err, data) => {
                     if (err) throw err;
                     client.close();
@@ -112,7 +112,7 @@ app.post('/assignstudent', (req, res) => {
             // mentor[mentors].students.push(JSON.parse(JSON.stringify(student[i])))
             mongoClient.connect(dbURL, (err, client) => {
                 if (err) throw err;
-                let db = client.db('studentmentor');
+                let db = client.db('studentmentor11');
                 db.collection("student").updateOne({ _id: i }, { $set: { mentor: mentors } }, (err, data) => {
                     if (err) throw err;
                     db.collection("mentor").updateOne({ _id: mentors }, { $push: { students: i } }, (err, data) => {
@@ -140,7 +140,7 @@ app.post('/liststudents', (req, res) => {
         let mid = mongodb.ObjectID(req.body.mentorId);
         mongoClient.connect(dbURL, (err, client) => {
             if (err) throw err;
-            let db = client.db('studentmentor');
+            let db = client.db('studentmentor11');
             db.collection("mentor").aggregate([{ $match: { _id: mid } }, {
                 $lookup: {
                     from: 'student',
@@ -160,7 +160,7 @@ app.post('/liststudents', (req, res) => {
 app.get('/listofmentors', (req, res) => {
     mongoClient.connect(dbURL, (err, client) => {
         if (err) throw err;
-        let db = client.db('studentmentor');
+        let db = client.db('studentmentor1');
         db.collection("mentor").aggregate([{
             $lookup: {
                 from: 'student',
@@ -182,7 +182,7 @@ app.get('/listofstudents', (req, res) => {
 
     mongoClient.connect(dbURL, (err, client) => {
         if (err) throw err;
-        let db = client.db('studentmentor');
+        let db = client.db('studentmentor1');
         db.collection("student").aggregate([{
             $lookup: {
                 from: 'mentor',
