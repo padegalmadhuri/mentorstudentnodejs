@@ -40,7 +40,7 @@ app.post('/mentor', (req, res) => {
         obj["students"] = [];
         mongoClient.connect(dbURL, (err, client) => {
                 if (err) throw err;
-                let db = client.db('studentmentor');
+                let db = client.db('mentorAssign');
                 db.collection("mentor").insertOne(obj, (err, data) => {
                     if (err) throw err;
                     client.close();
@@ -50,7 +50,15 @@ app.post('/mentor', (req, res) => {
                 })
 
             })
-
+            // mentor.push({
+            //     id: mentorId,
+            //     name: req.body.name,
+            //     age: req.body.age,
+            //     role: req.body.role,
+            //     phoneNo: req.body.phoneNo,
+            //     students: []
+            // })
+            // mentorId++;
 
     }
 })
@@ -65,7 +73,7 @@ app.post('/students', (req, res) => {
         obj["mentor"] = "";
         mongoClient.connect(dbURL, (err, client) => {
                 if (err) throw err;
-                let db = client.db('studentmentor');
+                let db = client.db('mentorAssign');
                 db.collection("student").insertOne(req.body, (err, data) => {
                     if (err) throw err;
                     client.close();
@@ -75,7 +83,15 @@ app.post('/students', (req, res) => {
                 })
 
             })
-
+            // student.push({
+            //     id: studentId,
+            //     name: req.body.name,
+            //     batchNo: req.body.batchNo,
+            //     course: req.body.course,
+            //     phoneNo: req.body.phoneNo,
+            //     mentor: ""
+            // })
+            // studentId++;
 
     }
 })
@@ -92,10 +108,11 @@ app.post('/assignstudent', (req, res) => {
         let studentIds = req.body.students;
         for (let i of studentIds) {
             i = mongodb.ObjectID(i);
-
+            // student[i].mentor = JSON.parse(JSON.stringify(mentor[mentors]));
+            // mentor[mentors].students.push(JSON.parse(JSON.stringify(student[i])))
             mongoClient.connect(dbURL, (err, client) => {
                 if (err) throw err;
-                let db = client.db('studentmentor');
+                let db = client.db('mentorAssign');
                 db.collection("student").updateOne({ _id: i }, { $set: { mentor: mentors } }, (err, data) => {
                     if (err) throw err;
                     db.collection("mentor").updateOne({ _id: mentors }, { $push: { students: i } }, (err, data) => {
@@ -123,7 +140,7 @@ app.post('/liststudents', (req, res) => {
         let mid = mongodb.ObjectID(req.body.mentorId);
         mongoClient.connect(dbURL, (err, client) => {
             if (err) throw err;
-            let db = client.db('studentmentor');
+            let db = client.db('mentorAssign');
             db.collection("mentor").aggregate([{ $match: { _id: mid } }, {
                 $lookup: {
                     from: 'student',
@@ -143,7 +160,7 @@ app.post('/liststudents', (req, res) => {
 app.get('/listofmentors', (req, res) => {
     mongoClient.connect(dbURL, (err, client) => {
         if (err) throw err;
-        let db = client.db('studentmentor');
+        let db = client.db('mentorAssign');
         db.collection("mentor").aggregate([{
             $lookup: {
                 from: 'student',
@@ -165,7 +182,7 @@ app.get('/listofstudents', (req, res) => {
 
     mongoClient.connect(dbURL, (err, client) => {
         if (err) throw err;
-        let db = client.db('studentmentor');
+        let db = client.db('mentorAssign');
         db.collection("student").aggregate([{
             $lookup: {
                 from: 'mentor',
